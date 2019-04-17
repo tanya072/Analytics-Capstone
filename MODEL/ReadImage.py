@@ -9,6 +9,7 @@ class ReadImage():
 
 
     def makecopy(self):
+
         if not os.path.exists(self.target_path):
             try:
                 print('making copy')
@@ -17,15 +18,16 @@ class ReadImage():
                 for self.file_path, self.target_path, msg in e.args[0]:
                     print(self.file_path, self.target_path, msg)
         else:
-            print('path exist')
+            print('removing last copy')
+            shutil.rmtree(self.target_path)
+            shutil.copytree(self.file_path, self.target_path)
 
     def move_image(self):
         allDir = os.listdir(self.target_path)
-        if os.path.exists(self.target_path + '/' + 'Release'):
-            print('removing Release path')
-        else:
-            os.mkdir(self.target_path + '/' + 'Release')
 
+
+        os.mkdir(self.target_path + '/' + 'Release')
+        print('Start copying')
         for dir in allDir:
             # 5 Class
             sonDirName = os.path.join(self.target_path, dir)
@@ -37,11 +39,11 @@ class ReadImage():
                 #print(imDirName)
                 imDir=os.listdir(imDirName)
                 for im in imDir:
-                    if not os.path.exists(self.target_path + '/' + 'Release' + '/' + dir +'_copy'):
-                        os.mkdir(self.target_path + '/' + 'Release' + '/' + dir +'_copy')
+                    if not os.path.exists(self.target_path + '/' + 'Release' + '/' + dir):
+                        os.mkdir(self.target_path + '/' + 'Release' + '/' + dir)
                     imname=os.path.join(imDirName, im)
                     #print(imname)
-                    tardir = self.target_path + '/' + 'Release' + '/' + dir +'_copy' + '/' + str(i)
+                    tardir = self.target_path + '/' + 'Release' + '/' + dir + '/' + str(i)
                     #print(tardir)
                     shutil.copy(imname, tardir)
                     i += 1
