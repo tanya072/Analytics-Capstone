@@ -2,16 +2,17 @@ from keras.preprocessing.image import ImageDataGenerator
 import os
 import random
 import numpy
-class ImageGeneration():
+
+class ImageNormalization():
     def __init__(self, training_set):
         self.training_set = training_set
 
 
-    def Generation(self):
+    def Normalization(self):
+        if not os.path.exists(self.training_set + '/' + 'formal'):
+            os.mkdir(self.training_set + '/' + 'formal')
         batch_size = 1
-        train_datagen = ImageDataGenerator(rescale=1. / 255, rotation_range=50, height_shift_range=0.02,
-                                           width_shift_range=0.02, horizontal_flip=True,
-                                           fill_mode='reflect')
+        train_datagen = ImageDataGenerator(samplewise_center=True, samplewise_std_normalization=True)
 
         allDir = os.listdir(self.training_set)
         number=[];
@@ -31,21 +32,21 @@ class ImageGeneration():
                 pathDir = os.listdir(sonDirName)
                 # print(dir)
                 filenumber = len(pathDir)
-                picknumber = int(max(number) - filenumber)
-                print (max(number))
                 print (filenumber)
-                print (picknumber)
+
             i=0
-            if picknumber == 0:
+            if dir == 'formal':
                 break
             else:
+                if not os.path.exists(self.training_set + '/' + 'formal' + '/' + dir):
+                    os.mkdir(self.training_set + '/' + 'formal' + '/' + dir)
                 for batch in train_datagen.flow_from_directory(self.training_set,
                                                         classes = [str(dir)],
                                                         batch_size=batch_size,
-                                                        save_to_dir=self.training_set + '/' + dir,
+                                                        save_to_dir=self.training_set + '/' + 'formal' + '/' + dir,
                                                         save_prefix='ge',
                                                         save_format='tif',
                                                         ):
                     i += 1
-                    if i >= picknumber:
+                    if i >= max(number):
                         break

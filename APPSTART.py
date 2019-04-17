@@ -3,6 +3,7 @@ import os
 from MODEL.ReadImage import *
 from MODEL.ImagePartition import *
 from MODEL.ImageGeneration import *
+from MODEL.ImageNormalization import *
 
 class APPSTART():
     def __init__(self, object):
@@ -14,11 +15,13 @@ class APPSTART():
         self.ImagePartition = ImagePartition(self.released_image,self.target_path)
         self.training_set = '/home/bobby/Documents/cancer_dataset/copy_data/train_set'
         self.ImageGeneration = ImageGeneration(self.training_set)
+        self.ImageNormalization = ImageNormalization(self.training_set)
     def run(self):
         self.ReadImage.makecopy()
         self.ReadImage.move_image()
         self.ImagePartition.Partition('0.2')
         self.ImageGeneration.Generation()
+        self.ImageNormalization.Normalization()
 
 if __name__ == '__main__':
     try:
