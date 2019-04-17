@@ -43,7 +43,7 @@ class ReadImage():
                         os.mkdir(self.target_path + '/' + 'Release' + '/' + dir)
                     imname=os.path.join(imDirName, im)
                     #print(imname)
-                    tardir = self.target_path + '/' + 'Release' + '/' + dir + '/' + str(i)
+                    tardir = self.target_path + '/' + 'Release' + '/' + dir + '/' + str(i) + '.tif'
                     #print(tardir)
                     shutil.copy(imname, tardir)
                     i += 1
