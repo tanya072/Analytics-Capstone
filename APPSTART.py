@@ -4,6 +4,10 @@ from MODEL.ReadImage import *
 from MODEL.ImagePartition import *
 from MODEL.ImageGeneration import *
 from MODEL.ImageNormalization import *
+from MODEL.Models import *
+from MODEL.Train import *
+from sklearn.preprocessing import LabelBinarizer
+
 
 class APPSTART():
     def __init__(self, object):
@@ -14,14 +18,38 @@ class APPSTART():
         self.released_image = '/home/bobby/Documents/cancer_dataset/copy_data/Release'
         self.ImagePartition = ImagePartition(self.released_image,self.target_path)
         self.training_set = '/home/bobby/Documents/cancer_dataset/copy_data/train_set'
+        self.test_set = '/home/bobby/Documents/cancer_dataset/copy_data/test_set'
         self.ImageGeneration = ImageGeneration(self.training_set)
-        self.ImageNormalization = ImageNormalization(self.training_set)
+        self.train_data = []
+        self.train_labels = []
+        self.test_data = []
+        self.test_labels = []
+        self.norm_size = 32
+        self.lb = LabelBinarizer()
+        self.ImageNormalization = ImageNormalization(self.training_set, self.test_set, self.train_data,
+                                                     self.train_labels, self.test_data, self.test_labels, self.lb)
+        self.classes = 5
+        self.class_list = []
+        self.Models = Models(self.classes, self.train_data, self.train_labels, self.class_list)
+        self.Train = Train(self.train_data, self.train_labels, self.test_data, self.test_labels, self.class_list)
+        self.model = self.Models.seq_setting(self.norm_size*self.norm_size*3)
     def run(self):
-        self.ReadImage.makecopy()
-        self.ReadImage.move_image()
-        self.ImagePartition.Partition('0.2')
-        self.ImageGeneration.Generation()
-        self.ImageNormalization.Normalization()
+        #self.ReadImage.makecopy()
+        #self.ReadImage.move_image()
+        #self.ImagePartition.Partition('0.2')
+        #self.ImageGeneration.Generation()
+        self.ImageNormalization.load_image(self.training_set, self.train_data, self.train_labels, self.norm_size)
+        self.ImageNormalization.load_image(self.test_set, self.test_data, self.test_labels, self.norm_size)
+        self.train_data = self.ImageNormalization.data_normalization(self.train_data)
+        self.train_labels = self.ImageNormalization.label_normalization(self.train_labels)
+
+        self.test_data = self.ImageNormalization.data_normalization(self.test_data)
+        self.test_labels = self.ImageNormalization.label_normalization(self.test_labels)
+        self.class_list = self.lb.classes_
+        print(self.class_list)
+        self.Train.train(self.model, self.train_data, self.train_labels, self.test_data, self.test_labels)
+
+
 
 if __name__ == '__main__':
     try:
