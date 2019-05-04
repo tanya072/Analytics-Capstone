@@ -12,13 +12,13 @@ from sklearn.preprocessing import LabelBinarizer
 class APPSTART():
     def __init__(self):
 
-        self.file_path = '/home/bobby/Documents/cancer_dataset/LAST_VERSION_15-4-2017'
-        self.target_path = '/home/bobby/Documents/cancer_dataset/copy_data'
+        self.file_path = 'C:/Users/bobby/Documents/Data/LAST_VERSION_15-4-2017'
+        self.target_path = 'C:/Users/bobby/Documents/Data/copy_data'
         self.ReadImage = ReadImage(self.file_path, self.target_path)
-        self.released_image = '/home/bobby/Documents/cancer_dataset/copy_data/Release'
+        self.released_image = 'C:/Users/bobby/Documents/Data/copy_data/Release'
         self.ImagePartition = ImagePartition(self.released_image,self.target_path)
-        self.training_set = '/home/bobby/Documents/cancer_dataset/copy_data/train_set'
-        self.test_set = '/home/bobby/Documents/cancer_dataset/copy_data/test_set'
+        self.training_set = 'C:/Users/bobby/Documents/Data/copy_data/train_set'
+        self.test_set = 'C:/Users/bobby/Documents/Data/copy_data/test_set'
         self.ImageGeneration = ImageGeneration(self.training_set)
         self.train_data = []
         self.train_labels = []
