@@ -24,15 +24,18 @@ class APPSTART():
         self.train_labels = []
         self.test_data = []
         self.test_labels = []
-        self.norm_size = 32
+        self.norm_size = 224
         self.lb = LabelBinarizer()
         self.ImageNormalization = ImageNormalization(self.training_set, self.test_set, self.train_data,
                                                      self.train_labels, self.test_data, self.test_labels, self.lb)
         self.classes = 5
         self.class_list = []
-        self.Models = Models(self.classes, self.train_data, self.train_labels, self.class_list)
+        self.Models = Models(self.classes, self.train_data, self.train_labels, self.test_data, self.test_labels,
+                             self.class_list)
         self.Train = Train(self.train_data, self.train_labels, self.test_data, self.test_labels, self.class_list)
-        self.model = self.Models.seq_setting(self.norm_size*self.norm_size*3)
+        self.model1 = self.Models.seq_setting(self.norm_size*self.norm_size*3)
+        self.model2 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes)
+
     def run(self):
         #self.ReadImage.makecopy()
         #self.ReadImage.move_image()
@@ -46,8 +49,10 @@ class APPSTART():
         self.test_data = self.ImageNormalization.data_normalization(self.test_data)
         self.test_labels = self.ImageNormalization.label_normalization(self.test_labels)
         self.class_list = self.lb.classes_
-        print(self.class_list)
-        self.Train.train(self.model, self.train_data, self.train_labels, self.test_data, self.test_labels)
+        #print(self.class_list)
+        #self.Train.train(self.model1, self.train_data, self.train_labels, self.test_data, self.test_labels)
+        self.Train.train(self.model2, self.train_data, self.train_labels, self.test_data, self.test_labels)
+
 
 
 

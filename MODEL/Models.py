@@ -18,37 +18,111 @@ from keras.layers.advanced_activations import PReLU
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD, Adadelta, Adagrad
 from keras.utils import np_utils, generic_utils
-
+from keras.layers import Input, Dense, Dropout, BatchNormalization, Conv2D, MaxPooling2D, AveragePooling2D, concatenate, \
+    Activation, ZeroPadding2D
+from keras.layers import add, Flatten
 
 
 class Models():
-    def __init__(self, classes, train_data, train_labels, class_list):
+    def __init__(self, classes, train_data, train_labels, test_data, test_labels, class_list):
         self.classes = classes
         self.train_data = train_data
         self.train_labels = train_labels
+        self.test_data = test_data
+        self.test_labels = test_labels
         self.class_list = class_list
 
-    def seq_setting(self, norm_size):
+    @staticmethod
+    def seq_setting(norm_size):
         model = Sequential()
-        #model.add(Dropout(0.5))
+
         model.add(Dense(512, input_shape=(norm_size,), activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(256, activation='relu'))
+        #model.add(Dropout(0.5))
+        #model.add(Dense(128, activation='relu'))
+        #model.add(Dropout(0.5))
+        #model.add(Dense(68, activation='relu'))
         model.add(Dense(5, activation='softmax'))
 
-        init_lr = 0.01
+        init_lr = 0.001
         opt = SGD(lr=init_lr)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         return model
 
-    @staticmethod
-    def inc_setting():
-        base_model = InceptionV3(weights='imagenet', include_top=False)
-        x = base_model.output
-        x = GlobalAveragePooling2D()(x)
-        x = Dense(1024, activation='relu')(x)
-        predictions = Dense(1, activation='softmax')(x)
-        model = Model(inputs=base_model.input, outputs=predictions)
-        for layer in base_model.layers:
-            layer.trainable = False
-        model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+    def Conv2d_BN(self, x, nb_filter, kernel_size, strides=(1, 1), padding='same', name=None):
+        if name is not None:
+            bn_name = name + '_bn'
+            conv_name = name + '_conv'
+        else:
+            bn_name = None
+            conv_name = None
+
+        x = Conv2D(nb_filter, kernel_size, padding=padding, strides=strides, activation='relu', name=conv_name)(x)
+        x = BatchNormalization(axis=3, name=bn_name)(x)
+        return x
+
+    def identity_Block(self, inpt, nb_filter, kernel_size, strides=(1, 1), with_conv_shortcut=False):
+        x = self.Conv2d_BN(inpt, nb_filter=nb_filter, kernel_size=kernel_size, strides=strides, padding='same')
+        x = self.Conv2d_BN(x, nb_filter=nb_filter, kernel_size=kernel_size, padding='same')
+        if with_conv_shortcut:
+            shortcut = self.Conv2d_BN(inpt, nb_filter=nb_filter, strides=strides, kernel_size=kernel_size)
+            x = add([x, shortcut])
+            return x
+        else:
+            x = add([x, inpt])
+            return x
+
+    def bottleneck_Block(self, inpt, nb_filters, strides=(1, 1), with_conv_shortcut=False):
+        k1, k2, k3 = nb_filters
+        x = self.Conv2d_BN(inpt, nb_filter=k1, kernel_size=1, strides=strides, padding='same')
+        x = self.Conv2d_BN(x, nb_filter=k2, kernel_size=3, padding='same')
+        x = self.Conv2d_BN(x, nb_filter=k3, kernel_size=1, padding='same')
+        if with_conv_shortcut:
+            shortcut = self.Conv2d_BN(inpt, nb_filter=k3, strides=strides, kernel_size=1)
+            x = add([x, shortcut])
+            return x
+        else:
+            x = add([x, inpt])
+            return x
+
+    def Res_setting(self, width, height, channel, classes):
+        inpt = Input(shape=(width, height, channel))
+        x = ZeroPadding2D((3, 3))(inpt)
+
+        # conv1
+        x = self.Conv2d_BN(x, nb_filter=64, kernel_size=(7, 7), strides=(2, 2), padding='valid')
+        x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='same')(x)
+
+        # conv2_x
+        x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
+
+        # conv3_x
+        x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
+        x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
+
+        # conv4_x
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
+
+        # conv5_x
+        x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
+        x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3))
+        x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3))
+        x = AveragePooling2D(pool_size=(7, 7))(x)
+        x = Flatten()(x)
+        x = Dense(classes, activation='softmax')(x)
+        init_lr = 0.001
+        opt = SGD(lr=init_lr)
+        model = Model(inputs=inpt, outputs=x)
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         return model
+

@@ -34,8 +34,9 @@ class ImageNormalization():
         random.shuffle(imagepaths)
         for imagePath in imagepaths:
             image = cv2.imread(imagePath)
-            image = cv2.resize(image, (norm_size, norm_size)).flatten()
-            #---image = img_to_array(image)
+            #image = cv2.resize(image, (norm_size, norm_size)).flatten()
+            image = cv2.resize(image, (norm_size, norm_size))
+            image = img_to_array(image)
             #image = image.reshape((1,) + image.shape)
             target_data.append(image)
             label = str(imagePath.split(os.path.sep)[-2])
