@@ -10,8 +10,8 @@ from sklearn.preprocessing import LabelBinarizer
 
 
 class APPSTART():
-    def __init__(self, object):
-        self.object = object
+    def __init__(self):
+
         self.file_path = '/home/bobby/Documents/cancer_dataset/LAST_VERSION_15-4-2017'
         self.target_path = '/home/bobby/Documents/cancer_dataset/copy_data'
         self.ReadImage = ReadImage(self.file_path, self.target_path)
@@ -58,7 +58,7 @@ class APPSTART():
 
 if __name__ == '__main__':
     try:
-        APP = APPSTART(object)
+        APP = APPSTART()
         APP.run()
 
     except KeyboardInterrupt:
@@ -67,4 +67,4 @@ if __name__ == '__main__':
             sys.exit(1)
         except SystemExit:
             print("Exception when exit python")
-            os.exit(0)
+            sys.exit(0)
