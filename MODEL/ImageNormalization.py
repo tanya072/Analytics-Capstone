@@ -37,6 +37,7 @@ class ImageNormalization():
             #image = cv2.resize(image, (norm_size, norm_size)).flatten()
             image = cv2.resize(image, (norm_size, norm_size))
             image = img_to_array(image)
+            #image = np.expand_dims(image, axis=0)
             #image = image.reshape((1,) + image.shape)
             target_data.append(image)
             label = str(imagePath.split(os.path.sep)[-2])

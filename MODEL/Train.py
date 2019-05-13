@@ -38,25 +38,29 @@ class Train():
 
 
 
-    def train(self, model, input_data, input_labels, val_data, val_labels):
-        epoches = 10
-        models = model.fit(input_data, input_labels, validation_data=(val_data, val_labels), epochs=epoches, batch_size=8)
+    def train(self, model, input_data, input_labels, val_data, val_labels, name, epoches = 50):
+
+        models = model.fit(input_data, input_labels, validation_data=(val_data, val_labels), epochs=epoches, batch_size=16)
         print('[INFO] Evaluating model')
-        predictions = model.predict(val_data, batch_size=8)
-        print(classification_report(val_labels.argmax(axis=1), predictions.argmax(axis=1),
-                                    target_names=['DNB', 'GN', 'GNB_3_SP', 'PDNB', 'UDNB']))
+        predictions = model.predict(val_data, batch_size=16)
+        result = classification_report(val_labels.argmax(axis=1), predictions.argmax(axis=1),
+                                    target_names=['DNB', 'GN', 'GNB_3_SP', 'PDNB', 'UDNB'])
+        print(result)
         print(confusion_matrix(val_labels.argmax(axis=1), predictions.argmax(axis=1), labels=[0,1,2,3,4]))
+
+        with open(str(name)+".txt", "w") as f:
+            f.write(result)
 
         N = np.arange(0, epoches)
         plt.style.use('ggplot')
         plt.figure()
         plt.plot(N, models.history['loss'], label='train_loss')
         plt.plot(N, models.history['val_loss'], label='val_loss')
-        plt.plot(N, models.history['acc'], label='train_acc')
-        plt.plot(N, models.history['val_acc'], label='val_acc')
+        #plt.plot(N, models.history['acc'], label='train_acc')
+        #plt.plot(N, models.history['val_acc'], label='val_acc')
         plt.title('Training loss and Accuracy')
         plt.xlabel('epoch #')
         plt.ylabel('loss/accuracy')
         plt.legend()
-        plt.savefig('plot.png')
+        plt.savefig(str(name)+'.png')
         #model.save(sys.args['model'])

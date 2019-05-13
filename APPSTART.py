@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 from MODEL.ReadImage import *
@@ -12,13 +13,13 @@ from sklearn.preprocessing import LabelBinarizer
 class APPSTART():
     def __init__(self):
 
-        self.file_path = 'C:/Users/bobby/Documents/Data/LAST_VERSION_15-4-2017'
-        self.target_path = 'C:/Users/bobby/Documents/Data/copy_data'
+        self.file_path = '/home/dylan/文档/data/LAST_VERSION_15-4-2017'
+        self.target_path = '/home/dylan/文档/data/copy_data'
         self.ReadImage = ReadImage(self.file_path, self.target_path)
-        self.released_image = 'C:/Users/bobby/Documents/Data/copy_data/Release'
+        self.released_image = '/home/dylan/文档/data/copy_data/Release'
         self.ImagePartition = ImagePartition(self.released_image,self.target_path)
-        self.training_set = 'C:/Users/bobby/Documents/Data/copy_data/train_set'
-        self.test_set = 'C:/Users/bobby/Documents/Data/copy_data/test_set'
+        self.training_set = '/home/dylan/文档/data/copy_data/train_set'
+        self.test_set = '/home/dylan/文档/data/copy_data/test_set'
         self.ImageGeneration = ImageGeneration(self.training_set)
         self.train_data = []
         self.train_labels = []
@@ -33,8 +34,19 @@ class APPSTART():
         self.Models = Models(self.classes, self.train_data, self.train_labels, self.test_data, self.test_labels,
                              self.class_list)
         self.Train = Train(self.train_data, self.train_labels, self.test_data, self.test_labels, self.class_list)
-        self.model1 = self.Models.seq_setting(self.norm_size*self.norm_size*3)
+        #self.model1 = self.Models.seq_setting(self.norm_size*self.norm_size*3)
         self.model2 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes)
+        self.model3 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.25)
+        self.model4 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.5)
+        self.model5 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.75)
+        #self.model6 = self.Models.res50((self.norm_size, self.norm_size, 3), self.classes)
+        self.model7 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.001), dp=0.25)
+        self.model8 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=RMSprop(lr=0.001), dp=0.25)
+        self.model9 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adagrad(lr=0.001), dp=0.25)
+        self.model10 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adam(lr=0.001), dp=0.25)
+        self.model11 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.005), dp=0.25)
+        self.model12 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.01), dp=0.25)
+        self.model13 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.0001), dp=0.25)
 
     def run(self):
         #self.ReadImage.makecopy()
@@ -51,10 +63,24 @@ class APPSTART():
         self.class_list = self.lb.classes_
         #print(self.class_list)
         #self.Train.train(self.model1, self.train_data, self.train_labels, self.test_data, self.test_labels)
-        self.Train.train(self.model2, self.train_data, self.train_labels, self.test_data, self.test_labels)
-
-
-
+        self.Train.train(self.model2, self.train_data, self.train_labels, self.test_data, self.test_labels, 'no_dp')
+        #self.Train.train(self.model6, self.train_data, self.train_labels, self.test_data, self.test_labels)
+        # self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25')
+        # self.Train.train(self.model4, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.5')
+        # self.Train.train(self.model5, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.75')
+        # self.Train.train(self.model7, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25_SGD0.001')
+        # self.Train.train(self.model8, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_RMSprop')
+        # self.Train.train(self.model9, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_Adagrad')
+        # self.Train.train(self.model10, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_Adam')
+        # self.Train.train(self.model11, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_SGD0.005')
+        # self.Train.train(self.model12, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_SGD0.01')
+        # self.Train.train(self.model13, self.train_data, self.train_labels, self.test_data, self.test_labels,
+        #                  'dp0.25_SGD0.0001')
 
 if __name__ == '__main__':
     try:

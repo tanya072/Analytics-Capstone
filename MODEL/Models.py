@@ -11,16 +11,25 @@ from keras.optimizers import SGD
 import numpy as np
 from keras.models import *
 from keras.models import Model
-from keras.layers import Dense, GlobalAveragePooling2D
+from keras.layers import Dense, GlobalAveragePooling2D, GlobalMaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.advanced_activations import PReLU
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
-from keras.optimizers import SGD, Adadelta, Adagrad
+from keras.optimizers import SGD, Adam, RMSprop, Adadelta, Adagrad
 from keras.utils import np_utils, generic_utils
 from keras.layers import Input, Dense, Dropout, BatchNormalization, Conv2D, MaxPooling2D, AveragePooling2D, concatenate, \
     Activation, ZeroPadding2D
 from keras.layers import add, Flatten
+from keras import backend as K, layers
+from keras_applications.imagenet_utils import _obtain_input_shape
+import warnings
+from keras.utils import layer_utils
+from keras.utils.data_utils import get_file
+from keras.engine.topology import get_source_inputs
+from keras.applications import ResNet50
+from keras.utils import plot_model
+from keras import regularizers
 
 
 class Models():
@@ -86,7 +95,8 @@ class Models():
             x = add([x, inpt])
             return x
 
-    def Res_setting(self, width, height, channel, classes):
+    #resnet_34
+    def Res_setting(self, width, height, channel, classes, opt=SGD(lr=0.001), dp=0.1):
         inpt = Input(shape=(width, height, channel))
         x = ZeroPadding2D((3, 3))(inpt)
 
@@ -95,17 +105,20 @@ class Models():
         x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), padding='same')(x)
 
         # conv2_x
+
         x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=64, kernel_size=(3, 3))
 
         # conv3_x
+
         x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
         x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=128, kernel_size=(3, 3))
 
         # conv4_x
+
         x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
         x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
@@ -114,15 +127,38 @@ class Models():
         x = self.identity_Block(x, nb_filter=256, kernel_size=(3, 3))
 
         # conv5_x
+
         x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3), strides=(2, 2), with_conv_shortcut=True)
         x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3))
         x = self.identity_Block(x, nb_filter=512, kernel_size=(3, 3))
+
+
         x = AveragePooling2D(pool_size=(7, 7))(x)
+
+        x = Dropout(dp)(x)
+
         x = Flatten()(x)
         x = Dense(classes, activation='softmax')(x)
-        init_lr = 0.001
-        opt = SGD(lr=init_lr)
+
+
         model = Model(inputs=inpt, outputs=x)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         return model
+
+    def res50(self, shapes, classes):
+        base_model = ResNet50(include_top=False, weights='imagenet', input_tensor=None, input_shape=shapes,
+                     pooling=None, classes=classes)
+        for layer in base_model.layers:
+            layer.trainable = False
+        x = base_model.output
+        x = Dropout(0.5)(x)
+        x = Flatten()(x)
+        predictions = Dense(classes, activation='softmax', kernel_regularizer=regularizers.l1_l2(0.001, 1))(x)
+        model = Model(inputs=base_model.input, outputs=predictions)
+        init_lr = 0.001
+        opt = SGD(lr=init_lr)
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+        plot_model(model, to_file='resnet50_model.png', show_shapes=True)
+        return model
+
 
