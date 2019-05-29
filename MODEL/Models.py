@@ -96,7 +96,7 @@ class Models():
             return x
 
     #resnet_34
-    def Res_setting(self, width, height, channel, classes, opt=SGD(lr=0.001), dp=0.1):
+    def Res_setting(self, width, height, channel, classes, opt=SGD(lr=0.001), dp=0):
         inpt = Input(shape=(width, height, channel))
         x = ZeroPadding2D((3, 3))(inpt)
 

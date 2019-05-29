@@ -46,10 +46,13 @@ class Train():
         result = classification_report(val_labels.argmax(axis=1), predictions.argmax(axis=1),
                                     target_names=['DNB', 'GN', 'GNB_3_SP', 'PDNB', 'UDNB'])
         print(result)
-        print(confusion_matrix(val_labels.argmax(axis=1), predictions.argmax(axis=1), labels=[0,1,2,3,4]))
+        cm = confusion_matrix(val_labels.argmax(axis=1), predictions.argmax(axis=1), labels=[0,1,2,3,4])
+        print(cm)
 
         with open(str(name)+".txt", "w") as f:
             f.write(result)
+        with open(str(name)+"cm.txt", "w") as f:
+            f.write(str(cm))
 
         N = np.arange(0, epoches)
         plt.style.use('ggplot')
@@ -61,6 +64,7 @@ class Train():
         plt.title('Training loss and Accuracy')
         plt.xlabel('epoch #')
         plt.ylabel('loss/accuracy')
+        plt.ylim((0, 10))
         plt.legend()
         plt.savefig(str(name)+'.png')
         #model.save(sys.args['model'])

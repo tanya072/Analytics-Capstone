@@ -36,17 +36,17 @@ class APPSTART():
         self.Train = Train(self.train_data, self.train_labels, self.test_data, self.test_labels, self.class_list)
         #self.model1 = self.Models.seq_setting(self.norm_size*self.norm_size*3)
         self.model2 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes)
-        self.model3 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.25)
+        self.model3 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.25,opt=SGD(lr=0.01))
         self.model4 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.5)
         self.model5 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.75)
         #self.model6 = self.Models.res50((self.norm_size, self.norm_size, 3), self.classes)
-        self.model7 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.001), dp=0.25)
-        self.model8 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=RMSprop(lr=0.001), dp=0.25)
-        self.model9 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adagrad(lr=0.001), dp=0.25)
-        self.model10 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adam(lr=0.001), dp=0.25)
-        self.model11 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.005), dp=0.25)
-        self.model12 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.01), dp=0.25)
-        self.model13 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.0001), dp=0.25)
+        self.model7 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.001))
+        self.model8 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=RMSprop(lr=0.001))
+        self.model9 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adagrad(lr=0.001))
+        self.model10 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=Adam(lr=0.001))
+        self.model11 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.005))
+        self.model12 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.01))
+        self.model13 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, opt=SGD(lr=0.0001))
 
     def run(self):
         #self.ReadImage.makecopy()
@@ -63,24 +63,20 @@ class APPSTART():
         self.class_list = self.lb.classes_
         #print(self.class_list)
         #self.Train.train(self.model1, self.train_data, self.train_labels, self.test_data, self.test_labels)
-        self.Train.train(self.model2, self.train_data, self.train_labels, self.test_data, self.test_labels, 'no_dp')
+        self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, '0.01dp0.25')
         #self.Train.train(self.model6, self.train_data, self.train_labels, self.test_data, self.test_labels)
-        # self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25')
-        # self.Train.train(self.model4, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.5')
-        # self.Train.train(self.model5, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.75')
-        # self.Train.train(self.model7, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25_SGD0.001')
-        # self.Train.train(self.model8, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_RMSprop')
-        # self.Train.train(self.model9, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_Adagrad')
-        # self.Train.train(self.model10, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_Adam')
-        # self.Train.train(self.model11, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_SGD0.005')
+        #self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25')
+        #self.Train.train(self.model4, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.5')
+        #self.Train.train(self.model5, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.75')
+        #self.Train.train(self.model7, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0_SGD0.001')
+        #self.Train.train(self.model8, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0_RMSprop')
+        #self.Train.train(self.model9, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0_Adagrad')
+        #self.Train.train(self.model10, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0_Adam')
+        # self.Train.train(self.model11, self.train_data, self.train_labels, self.test_data, self.test_labels,'dp0_SGD0.005')
         # self.Train.train(self.model12, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_SGD0.01')
+        #                  'dp0_SGD0.01')
         # self.Train.train(self.model13, self.train_data, self.train_labels, self.test_data, self.test_labels,
-        #                  'dp0.25_SGD0.0001')
+        #                  'dp0_SGD0.0001')
 
 if __name__ == '__main__':
     try:
