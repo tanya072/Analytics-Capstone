@@ -143,6 +143,7 @@ class Models():
 
         model = Model(inputs=inpt, outputs=x)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+        model.save("yes")
         return model
 
     def res50(self, shapes, classes):
@@ -153,7 +154,7 @@ class Models():
         x = base_model.output
         x = Dropout(0.5)(x)
         x = Flatten()(x)
-        predictions = Dense(classes, activation='softmax', kernel_regularizer=regularizers.l1_l2(0.001, 1))(x)
+        predictions = Dense(classes, activation='softmax', kernel_regularizer=regularizers.l1(0.01))(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         init_lr = 0.001
         opt = SGD(lr=init_lr)

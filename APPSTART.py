@@ -8,7 +8,7 @@ from MODEL.ImageNormalization import *
 from MODEL.Models import *
 from MODEL.Train import *
 from sklearn.preprocessing import LabelBinarizer
-
+from MODEL.Prediction import *
 
 class APPSTART():
     def __init__(self):
@@ -20,6 +20,7 @@ class APPSTART():
         self.ImagePartition = ImagePartition(self.released_image,self.target_path)
         self.training_set = '/home/dylan/文档/data/copy_data/train_set'
         self.test_set = '/home/dylan/文档/data/copy_data/test_set'
+        self.predict_data = '/home/dylan/文档/data/test_data/DNB/I (1).tif'
         self.ImageGeneration = ImageGeneration(self.training_set)
         self.train_data = []
         self.train_labels = []
@@ -34,9 +35,10 @@ class APPSTART():
         self.Models = Models(self.classes, self.train_data, self.train_labels, self.test_data, self.test_labels,
                              self.class_list)
         self.Train = Train(self.train_data, self.train_labels, self.test_data, self.test_labels, self.class_list)
+        self.Prediction = Prediction(self.predict_data, self.norm_size, self.lb)
         #self.model1 = self.Models.seq_setting(self.norm_size*self.norm_size*3)
         self.model2 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes)
-        self.model3 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.25,opt=SGD(lr=0.01))
+        self.model3 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0, opt=SGD(lr=0.01))
         self.model4 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.5)
         self.model5 = self.Models.Res_setting(self.norm_size, self.norm_size, 3, self.classes, dp=0.75)
         #self.model6 = self.Models.res50((self.norm_size, self.norm_size, 3), self.classes)
@@ -63,8 +65,8 @@ class APPSTART():
         self.class_list = self.lb.classes_
         #print(self.class_list)
         #self.Train.train(self.model1, self.train_data, self.train_labels, self.test_data, self.test_labels)
-        self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, '0.01dp0.25')
-        #self.Train.train(self.model6, self.train_data, self.train_labels, self.test_data, self.test_labels)
+        self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, 'yy')
+        #self.Train.train(self.model6, self.train_data, self.train_labels, self.test_data, self.test_labels, 'RES_50')
         #self.Train.train(self.model3, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.25')
         #self.Train.train(self.model4, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.5')
         #self.Train.train(self.model5, self.train_data, self.train_labels, self.test_data, self.test_labels, 'dp0.75')
@@ -77,6 +79,7 @@ class APPSTART():
         #                  'dp0_SGD0.01')
         # self.Train.train(self.model13, self.train_data, self.train_labels, self.test_data, self.test_labels,
         #                  'dp0_SGD0.0001')
+        self.Prediction.prediction(self.predict_data, self.norm_size, self.model3)
 
 if __name__ == '__main__':
     try:
